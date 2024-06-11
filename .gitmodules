@@ -1,0 +1,3 @@
+[submodule "trampoline-benchmarks"]
+	path = trampoline-benchmarks
+	url = https://github.com/sankalpgambhir/trampoline-benchmarks
