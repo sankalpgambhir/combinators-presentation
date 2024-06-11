@@ -1,0 +1,148 @@
+@article{Broda_Damas_1997,
+  title   = {Compact bracket abstraction in combinatory logic},
+  volume  = {62},
+  doi     = {10.2307/2275570},
+  number  = {3},
+  journal = {Journal of Symbolic Logic},
+  author  = {Broda, Sabine and Damas, Luís},
+  year    = {1997},
+  pages   = {729–740}
+}
+
+@book{peytonjones1987the,
+  author    = {Peyton Jones, Simon},
+  title     = {The Implementation of Functional Programming Languages},
+  year      = {1987},
+  month     = {April},
+  abstract  = {“The Implementation of Functional Languages” is a book about implementing functional programming languages using lazy graph reduction, and it divides into three parts. The first part describes how to translate a high-level functional language into an intermediate language, called the lambda calculus, incuding detailed coverage of pattern-matching and type-checking. The second part begins with a simple implementation of the lambda calculus, based on graph reduction, and then develops a number of refinements and alternatives. The third part describes the G-machine, a sophisticated implementation of graph reduction, which provides a dramatic increase in performance over the implementations described earlier.},
+  publisher = {Prentice Hall Internaltional (UK) Ltd.},
+  url       = {https://www.microsoft.com/en-us/research/publication/the-implementation-of-functional-programming-languages-2/},
+  note      = {Chapters also by: Philip Wadler, Programming Research Group, Oxford; Peter Hancock, Metier Management Systems, Ltd.; David Turner, University of Kent, Canterbury}
+}
+
+@article{turner1979new,
+  title     = {A new implementation technique for applicative languages},
+  author    = {Turner, David A},
+  journal   = {Software: Practice and Experience},
+  volume    = {9},
+  number    = {1},
+  pages     = {31--49},
+  year      = {1979},
+  publisher = {Wiley Online Library}
+}
+
+@misc{nlab:realizabilitytopos,
+  author       = {{nLab authors}},
+  title        = {realizability topos},
+  howpublished = {\url{https://ncatlab.org/nlab/show/realizability+topos}},
+  note         = {\href{https://ncatlab.org/nlab/revision/realizability+topos/23}{Revision 23}},
+  month        = jun,
+  year         = 2024
+}
+
+@misc{nlab:combinatorylogic,
+  author       = {{nLab authors}},
+  title        = {combinatory logic},
+  howpublished = {\url{https://ncatlab.org/nlab/show/combinatory+logic}},
+  note         = {\href{https://ncatlab.org/nlab/revision/combinatory+logic/13}{Revision 13}},
+  month        = jun,
+  year         = 2024
+}
+
+@misc{nlab:partialcombinatoryalgebra,
+  author       = {{nLab authors}},
+  title        = {partial combinatory algebra},
+  howpublished = {\url{https://ncatlab.org/nlab/show/partial+combinatory+algebra}},
+  note         = {\href{https://ncatlab.org/nlab/revision/partial+combinatory+algebra/25}{Revision 25}},
+  month        = jun,
+  year         = 2024
+}
+
+@article{10.1145/276393.276397,
+  author     = {Douence, R\'{e}mi and Fradet, Pascal},
+  title      = {A systematic study of functional language implementations},
+  year       = {1998},
+  issue_date = {March 1998},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {20},
+  number     = {2},
+  issn       = {0164-0925},
+  url        = {https://doi.org/10.1145/276393.276397},
+  doi        = {10.1145/276393.276397},
+  abstract   = {We introduce a unified framework to describe, relate, compare, and classify functional language implementations. The compilation process is expressed as a succession of program transformations in the common framework. At each step, different transformations model fundamental choices. A benefit of this approach is to structure and decompose the implementation process. The correctness proofs can be tackled independently for each step and amount to proving program transformations in the functional world. This approach also paves the way to formal comparisons by making it possible to estimate the complexity of individual transformations or compositions of them. Our study aims at covering the whole known design space of sequential functional language implementations. In particular, we  consider call-by-value, call-by-name, call-by-need reduction strategies as well as environment- and graph-based implementations. We describe for each compilation step the diverse alternatives as program transformations. In some cases, we illustrate how to compare or relate compilation techniques, express global optimizations, or hybrid implementations. We also provide a classification of well-known abstract machines.},
+  journal    = {ACM Trans. Program. Lang. Syst.},
+  month      = {mar},
+  pages      = {344–387},
+  numpages   = {44},
+  keywords   = {program transformation, functional programming, compilers, combinators, abstract machines}
+}
+
+@inproceedings{10.1145/1016850.1016856,
+  author    = {Marlow, Simon and Jones, Simon Peyton},
+  title     = {Making a fast curry: push/enter vs. eval/apply for higher-order languages},
+  year      = {2004},
+  isbn      = {1581139055},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/1016850.1016856},
+  doi       = {10.1145/1016850.1016856},
+  abstract  = {Higher-order languages that encourage currying are implemented using one of two basic evaluation models: push/enter or eval/apply. Implementors use their intuition and qualitative judgements to choose one model or the other.Our goal in this paper is to provide, for the first time, a more substantial basis for this choice, based on our qualitative and quantitative experience of implementing both models in a state-of-the-art compiler for Haskell.Our conclusion is simple, and contradicts our initial intuition: compiled implementations should use eval/apply.},
+  booktitle = {Proceedings of the Ninth ACM SIGPLAN International Conference on Functional Programming},
+  pages     = {4–15},
+  numpages  = {12},
+  location  = {Snow Bird, UT, USA},
+  series    = {ICFP '04}
+}
+
+@article{10.1145/1016848.1016856,
+  author     = {Marlow, Simon and Jones, Simon Peyton},
+  title      = {Making a fast curry: push/enter vs. eval/apply for higher-order languages},
+  year       = {2004},
+  issue_date = {September 2004},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {39},
+  number     = {9},
+  issn       = {0362-1340},
+  url        = {https://doi.org/10.1145/1016848.1016856},
+  doi        = {10.1145/1016848.1016856},
+  abstract   = {Higher-order languages that encourage currying are implemented using one of two basic evaluation models: push/enter or eval/apply. Implementors use their intuition and qualitative judgements to choose one model or the other.Our goal in this paper is to provide, for the first time, a more substantial basis for this choice, based on our qualitative and quantitative experience of implementing both models in a state-of-the-art compiler for Haskell.Our conclusion is simple, and contradicts our initial intuition: compiled implementations should use eval/apply.},
+  journal    = {SIGPLAN Not.},
+  month      = {sep},
+  pages      = {4–15},
+  numpages   = {12}
+}
+
+@article{jones1992implementing,
+  author    = {Jones, Peyton and L, Simon and Peyton Jones, Simon},
+  title     = {Implementing Lazy Functional Languages on Stock Hardware: The Spineless Tagless G-machine},
+  year      = {1992},
+  month     = {July},
+  abstract  = {The Spineless Tagless G-machine is an abstract machine designed to support non- strict higher-order functional languages. This presentation of the machine falls into three parts. Firstly, we give a general discussion of the design issues involved in implementing non-strict functional languages.
+               Next, we present the STG language, an austere but recognisably-functional language, which as well as a denotational meaning has a well-defined operational semantics. The STG language is the \abstract machine code" for the Spineless Tagless G-machine.
+               Lastly, we discuss the mapping of the STG language onto stock hardware. The success of an abstract machine model depends largely on how efficient this mapping can be made, though this topic is often relegated to a short section. Instead, we give a detailed discussion of the design issues and the choices we have made. Our principal target is the C language, treating the C compiler as a portable assembler.},
+  publisher = {Cambridge University Press},
+  url       = {https://www.microsoft.com/en-us/research/publication/implementing-lazy-functional-languages-on-stock-hardware-the-spineless-tagless-g-machine/},
+  pages     = {127-202},
+  journal   = {Journal of Functional Programming},
+  volume    = {2},
+  edition   = {Journal of Functional Programming}
+}
+
+@inproceedings{10.1145/99370.99386,
+  author    = {Augustsson, Lennart and Johnsson, Thomas},
+  title     = {Parallel graph reduction with the (v , G)-machine},
+  year      = {1989},
+  isbn      = {0897913280},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/99370.99386},
+  doi       = {10.1145/99370.99386},
+  booktitle = {Proceedings of the Fourth International Conference on Functional Programming Languages and Computer Architecture},
+  pages     = {202–213},
+  numpages  = {12},
+  location  = {Imperial College, London, United Kingdom},
+  series    = {FPCA '89}
+}
+

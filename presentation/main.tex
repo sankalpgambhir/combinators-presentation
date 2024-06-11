@@ -1,0 +1,459 @@
+%! TEX program = lualatex
+%! BIB program = biber
+\documentclass[aspectratio=1610, xcolor={dvipsnames}]{beamer}
+
+\usetheme[
+    % options
+]{metropolis}
+
+\setbeamercolor{background canvas}{bg = white}
+
+\input{macro}
+\usepackage{emoji}
+\usepackage[normalem]{ulem}
+
+\title{Trampolining: Dark Arts Edition}
+
+\begin{document}
+
+\begin{frame}
+    % hello
+    \centering
+    \hrule \vspace{1em}
+    {\Huge Trampolining \\ \vspace{0.2em}\(\mathfrak{Dark~ Arts~ Edition ~Part ~2}\)} \\
+    \vspace{1.5em} \hrule 
+    {\Huge \emoji{crystal-ball} \emoji{magic-wand}}
+\end{frame}
+
+\begin{frame}
+    % hello
+    \centering
+    \hrule \vspace{1em}
+    {\Huge Combinatory Logic, and an aside to GHC} \\
+    \vspace{1.5em} \hrule 
+    {\Huge \emoji{prohibited} \emoji{crystal-ball} \emoji{magic-wand} \emoji{prohibited}}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Motivation}
+\centering
+
+\begin{tikzpicture}
+    \node (code) at (0, 0) { 
+        \begin{lstlisting}[language=haskell,numbers=none]
+        double :: [a] -> [a]
+        double [] = []
+        double (hd : tl) = hd : hd : double tl
+        \end{lstlisting}
+     };
+
+     \node (von) at (-3, -2) {Von Neumann Machine};
+     \node (fol) at (5, -2) {First-order logic};
+
+     \draw[->] (code) -- (von);
+     \draw[->] (code) -- (fol);
+
+     \onslide<2-> {
+        \node (fun) at (1, -4) {Doesn't know what a ``function'' is};
+        \draw[->] (fun) -- (von);
+        \draw[->] (fun) -- (fol);
+     }
+\end{tikzpicture}
+
+% so from what we've been seeing of trampolining, the solution is to trade
+% computation for data.
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Recap}
+
+    Task: Take a list of size $1e7$, double it, and calculate its length.
+
+    \begin{lstlisting}[language=bash]
+    $ scala-cli run scala-list.sc
+    // DNF: stack overflow
+    \end{lstlisting}
+
+    \begin{lstlisting}[language=bash]
+    $ scala-cli run scala-defunc.sc
+    // 1240 ms 
+    \end{lstlisting}
+
+    \begin{lstlisting}[language=bash]
+    $ sbtn nativeLink && ./target/scala-3.3.3/scaladefunc
+    // defunctionalized version, no code changes
+    // 6046 ms (237 ms for 1e6)
+    \end{lstlisting}
+
+    \begin{lstlisting}[language=bash]
+    $ stack ghc --resolver nightly haskell-list.hs && ./haskell-list
+    // 67 ms
+    \end{lstlisting}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Sources}
+
+    Discussions with Shardul, Simon, and Viktor.
+
+    Several papers, added at the end.
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{First-order logic, optional recap}
+
+    A first-order structure:
+
+    \begin{itemize}
+        \item A domain / universe \(U\)
+        \item A set of relations \(R\)
+        \item A set of functions \(F\)
+    \end{itemize}
+
+    From the logic:
+    \begin{itemize}
+        \item A set of variables \(V\)
+        \item Logical connectives \(\land, \neg\)
+        \item Binder \(\forall\)
+    \end{itemize}
+
+    Notably, the relations and functions are \emph{not} first-class objects,
+    only elements of the universe are. We may write \(f(a)\) but never simply
+    \(f\).
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Functions as data: slightly more formal}
+
+    \begin{equation*}
+        \lambda x.\; \lambda y.\; x \;(y \;z)
+    \end{equation*}
+
+    \begin{itemize}
+        \item Free variable, \(z\)
+        \item Bound variables \(x, y\)
+    \end{itemize}
+
+    Can we simply write \(f = \lambda x.\; \lambda y.\; x \;(y \;z) \implies f \;a =  \lambda y.\; a\; (y\; z)\) ?
+
+    \pause
+
+    Could we write the LHS as \(\forall x.\; \forall y.\; f(x, y) = x(y(z))\)?
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Combinatory Logic}
+
+    \begin{quote}
+        ``Combinatory logic is a notation to eliminate the need for quantified variables in mathematical logic.''
+    \end{quote}
+
+    \pause
+
+    \begin{definition}[Baren]
+        A combinator is a lambda expression which contains no occurrences of a free variable.
+    \end{definition}
+
+    Standard example, the \(S\), \(K\), and \(I\) combinators:
+    \begin{align*}
+        S \;x \;y \;z &= x \;z \;(y \;z) \tag{Verschmelzungsfunktion}\\
+        K \;x \;y &= x \tag{Konstanzfunktion}\\
+        I \;x &= x \tag{Identit\"atsfunktion}
+    \end{align*} 
+
+    \pause
+    Older than the lambda calculus, Sch\"onfinkel (1924) and Curry (1930).
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{`Compiling' to combinatory logic}
+
+    Starting from the innermost abstraction:
+    \begin{align*}
+        \lambda x.\; x & \mapsto I \\
+        \lambda x.\; c & \mapsto K \;c \qquad (x \not \in fv(c), bv(c) = \emptyset) \\
+        \lambda x.\; e_1\; e_2 & \mapsto S \; (\lambda x.\; e_1) \;(\lambda x.\; e_2)
+    \end{align*}
+    \pause
+    \begin{align*}
+        &&\lambda x.\; \lambda y.\; x \;(y \;z) \\
+        &\onslide<2->{\mapsto} &  \onslide<3->{\lambda x.\; S \;(\lambda y. x) \;(\lambda y. y \;z)}\\
+        &\onslide<3->{\mapsto} &  \onslide<4->{\lambda x.\; S \;(K \;x) \;(\lambda y. y \;z)}\\
+        &\onslide<4->{\mapsto} &  \onslide<5->{\lambda x.\; S \;(K \;x) \;(S \; (\lambda y. \; y) (\lambda y. \; z))}\\
+        &\onslide<5->{\mapsto} &  \onslide<6->{\lambda x.\; (S \;(K \;x)) \;(S \; (I \;(K \;z)))}\\
+        &\onslide<6->{\mapsto} &  \onslide<7->{S\; (\lambda x. \;S \;(K \;x)) \;(\lambda x.\; S \; (I \;(K \;z)))}\\
+        &\onslide<7->{\mapsto} &  \onslide<8->{S\; ((K\; S) \;((K\; K) \;I)) \;(K \; (S \; (I \;(K \;z))))}\\
+    \end{align*}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Takeaways}
+
+    % I don't mean to say any of these are pros and cons of this system, just
+    % what we can learn from this
+
+    \begin{itemize}[<+->]
+        \item Eliminated bound variables (yay!)
+        \item Evaluation rules are like rewrites
+        \item In particular, cannot partially evaluate
+        \item But the generated term is huge (possibly cubic)
+        \item The term we generated was not minimal, but minimal terms are not
+        unique and hard to find
+    \end{itemize}
+
+    % I think xyz are pros, xyz are cons
+    % we don't know hwo to address the last one, but we can try to do something about this one
+    % any suggestions?
+
+    % well the reason these terms are large is ebcause our abstractions are somewhat minimal and strict
+    % in that sense we see that this highlights a really cool thing about the LC, that it's incredibly tiny but very expressive wrt term size
+
+    % so, we can try to expand our abstractions a bit, and for a bit, jump to an extreme, which is supercombinator compilation
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Supercombinator compilation}
+
+    % otherwise also called lambda-lifting
+    Motivation\footnote{Simon Peyton Jones (1987). The Implementation of Functional Programming Languages.}
+    \begin{equation*}
+        (\lambda x.\; \lambda y.\; - \;y \; x) \;3 \;4
+    \end{equation*}
+    %
+    \begin{itemize}[<+->]
+        \item We gain much: no intermediate term, one less step
+        \item We lose nothing wrt computation: the intermediate term is useless
+        % I quote, hence we may as well wait until both arguments are present and then perform both reductions at once
+        \item Issue: our computation model now needs to accommodate arbitrary arity reductions
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Supercombinators}
+
+    Solution: arbitrary arity reductions \emph{are} the computation model.
+
+    \begin{definition}
+        A supercombinator \(\$S\) of arity \(n\) is a lambda expression of the form:
+        \begin{equation*}
+            \lambda x_1.\; \lambda x_2.\; \ldots \lambda x_n.\; E
+        \end{equation*}
+        
+        where
+        \begin{itemize}
+            \item \(E\) is not a lambda abstraction
+            \item any lambda abstraction in \(E\) is a supercombinator itself
+            \item \(n \geq 0\)
+        \end{itemize}
+    \end{definition}
+
+    \pause
+    Each supercombinator is paired with a \emph{reduction} acting on a redex. A
+    \emph{supercombinator redex} is a fully applied supercombinator. 
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Compilation}
+
+    \begin{gather*}
+        \$XY = \lambda x.\; \lambda y.\; - \;y \;x \\ 
+        \onslide<2->{ \$XY \;x \;y = - \;y \;x }
+    \end{gather*}
+
+    \pause
+    \pause
+
+    \begin{center}
+        \begin{tabular}{l}
+            Rewrite rules: \\
+            \(\$XY \;x \;y = - \;y \;x\) \\
+            \hline
+            Expression to be evaluated: \\
+            \(\$XY \;3 \;4\)
+        \end{tabular}
+    \end{center}
+
+    % note that this is basically a let definitions in this expression block
+    % while I don't have a formal proof for you atm, I hope it intuitively makes
+    % sense that since if we expect the output of our program to be a
+    % first-order term, then we will keep finding supercombinator redexes until
+    % we're done evaluating
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Compilation: Example}
+
+    \begin{equation*}
+        (\lambda x. \; (\lambda y.\; + \;y \;x) \;x) \;4 
+    \end{equation*}
+
+    Notably, no supercombinators right now.
+
+    \pause
+
+    \vspace*{3em}
+
+    \begin{center}
+        \begin{tabular}{l}
+            \$YX \;y \;x = + \;y \;x \\
+            \$X \;x = \$YX \;x \;x \\
+            \hline
+            \$X \;4
+        \end{tabular}
+    \end{center}
+
+    \vspace*{3em}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Recursion, case analysis}
+
+    \begin{center}
+        \begin{tabular}{l}
+            \$L \;xs = \text{if } (=\; xs \;\text{nil}) \text{then} \;0 \text{else} \;1 + (\$L \;(\text{tail} \;xs)) \\
+            \hline
+            \$L \; (\text{cons} \;1 \;(\text{cons} \;2 \;(\text{cons} \;3 \;\text{nil}))) 
+        \end{tabular}
+    \end{center}
+
+    \footnote{Treatment of recursion from Johnsson, Augustsson (1985).}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Combinator Families}
+
+    Sch\"onfinkel's combinators \(\{S, K, I, B, C\}\) where:
+    \begin{align*}
+        B \;x \;y \;z &= x \;(y \;z) \\
+        C \;x \;y \;z &= x \;z \;y
+    \end{align*}
+
+    \pause
+
+    Define a family \(\Phi\) indexed by trees with words as leaves. Here \(w \in \{b, c\}^*\).
+    \begin{align*}
+        \Phi_\epsilon &= I \\
+        \Phi_{b\cdot w} \; x \; x_1 \ldots x_{|w| + 1}&= x \;(\Phi_w \;x_1 \;\ldots \; x_{|w| + 1}) \\
+        \Phi_{c\cdot w} \; x \; x_1 \ldots x_{|w| + 1}&= (\Phi_w \;x_1 \;\ldots \; x_{|w| + 1}) \;x \\
+        \Phi_{(t_1, t_2)} \; x_1 \ldots x_{|t_1|} \; y_1 \; \ldots \; y_{|t_2|} \; z &= (\Phi_{t_1} \;\bar x \;z) (\Phi_{t_2} \;\bar y \;z)
+    \end{align*}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Combinatory logic in GHC}
+
+    \begin{itemize}[<+->]
+        \item Was \emph{maybe} used as the foundation earlier?
+        \item Definitely switched by 2004 \\ \fullcite{10.1145/1016848.1016856}
+        \item But the core ideas remain
+        \item This is why the GHC assembly \emph{looked} familiar before but was still a bit alien
+        \item I understand it a bit more now
+        \item You can spot blocks of ``rewrites''
+        \item Every piece of data is a function, and every function is data
+    \end{itemize}
+
+\end{frame}
+
+% extras
+
+\begin{frame}
+    \frametitle{On history of combinators and of Sch\"onfinkel}
+
+    Stephen Wolfram (2020), "Combinators and the Story of Computation," Stephen
+    Wolfram Writings.
+    \url{https://writings.stephenwolfram.com/2020/12/combinators-and-the-story-of-computation}.
+
+    Stephen Wolfram (2020), "Where Did Combinators Come From? Hunting the Story
+    of Moses Schönfinkel," Stephen Wolfram Writings.
+    \url{https://writings.stephenwolfram.com/2020/12/where-did-combinators-come-from-hunting-the-story-of-moses-schonfinkel}.
+
+    Stephen Wolfram (2021), "A Little Closer to Finding What Became of Moses
+    Schönfinkel, Inventor of Combinators," Stephen Wolfram Writings.
+    \url{https://writings.stephenwolfram.com/2021/03/a-little-closer-to-finding-what-became-of-moses-schonfinkel-inventor-of-combinators.}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{In interpretations of intuitionistic logic}
+    
+    \fullcite{nlab:combinatorylogic}
+    
+    \fullcite{nlab:partialcombinatoryalgebra}
+
+    \fullcite{nlab:realizabilitytopos}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{On Combinator Compilation}
+
+    \fullcite{peytonjones1987the}
+
+    \fullcite{turner1979new}
+
+    \fullcite{Broda_Damas_1997}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Implementation details}
+
+    SASL:
+    
+    \fullcite{turner1979new}
+
+    Eventually became the G-Machine:
+
+    \fullcite{10.1145/99370.99386}
+
+    \fullcite{jones1992implementing}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{On comparison of implementation models}
+
+    \fullcite{10.1145/1016848.1016856}
+
+    \fullcite{10.1145/276393.276397}
+
+\end{frame}
+
+\begin{frame}
+
+    \begin{center}
+        \huge Thanks! Questions?
+    \end{center}
+
+    \vspace*{2em}
+
+    A summary:
+    \begin{itemize}
+        \item SKI combinators
+        \item Supercombinator compilation
+        \begin{itemize}
+            \item Lambda-lifting
+            \item Recursion
+            \item Combinator families
+        \end{itemize}
+        \item A look at remnants in GHC
+    \end{itemize}
+
+\end{frame}
+
+\printbibliography
+
+\end{document}
